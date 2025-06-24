@@ -1,0 +1,4 @@
+passlib
+uvicorn
+pydantic[email]
+passlib[bcrypt] 
