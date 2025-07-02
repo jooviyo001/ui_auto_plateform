@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.sqlite3
+*.db
+.env
+.venv/
+venv/
+
+# VSCode
+.vscode/
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# FastAPI/SQLAlchemy
+instance/
+*.db
+*.sqlite
+
+# 前端
+node_modules/
+dist/
+build/
+
+# 日志
+*.log
+
+# 其他
+.idea/ 

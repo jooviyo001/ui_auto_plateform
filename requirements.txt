@@ -1,4 +1,10 @@
 passlib
 uvicorn
 pydantic[email]
-passlib[bcrypt] 
+passlib[bcrypt]
+drissionpage
+celery
+redis
+python-jose
+pandas
+openpyxl 
