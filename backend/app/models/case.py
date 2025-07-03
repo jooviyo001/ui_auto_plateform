@@ -1,8 +1,6 @@
 from sqlalchemy import Column, Integer, String, Text, ForeignKey
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
-
-Base = declarative_base()
+from app.models import Base
 
 class Case(Base):
     __tablename__ = 'cases'

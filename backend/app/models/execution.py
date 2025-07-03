@@ -1,9 +1,7 @@
 from sqlalchemy import Column, Integer, String, DateTime, Text, ForeignKey
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 import datetime
-
-Base = declarative_base()
+from app.models import Base
 
 class ExecutionTask(Base):
     __tablename__ = 'execution_tasks'
