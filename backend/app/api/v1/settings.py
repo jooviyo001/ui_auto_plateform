@@ -1,10 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.core.database import SessionLocal
-from app.schemas.setting import SettingBase, SettingOut
+from app.schemas.setting import Setting, SettingOut
 from app.services.setting_service import SettingService
 from app.api.v1.user import require_roles, ROLE_SUPERADMIN, get_current_user
 from typing import List
+from app.utils.response import success, fail
+from app.schemas.common import ResponseModel
 
 router = APIRouter()
 
@@ -15,17 +17,19 @@ def get_db():
     finally:
         db.close()
 
-@router.get('/', response_model=List[SettingOut])
+@router.get('/', response_model=ResponseModel)
 def list_settings(group: str = None, db: Session = Depends(get_db), _: str = Depends(require_roles([ROLE_SUPERADMIN]))):
-    return SettingService.get_all(db, group)
+    data = SettingService.get_all(db, group)
+    return success(data)
 
-@router.post('/', response_model=SettingOut)
-def set_setting(setting: SettingBase, db: Session = Depends(get_db), _: str = Depends(require_roles([ROLE_SUPERADMIN]))):
-    return SettingService.set_setting(db, setting)
+@router.post('/', response_model=ResponseModel)
+def set_setting(setting: Setting, db: Session = Depends(get_db), _: str = Depends(require_roles([ROLE_SUPERADMIN]))):
+    data = SettingService.set_setting(db, setting)
+    return success(data, msg="设置成功")
 
-@router.delete('/{key}')
+@router.delete('/{key}', response_model=ResponseModel)
 def delete_setting(key: str, db: Session = Depends(get_db), _: str = Depends(require_roles([ROLE_SUPERADMIN]))):
     ok = SettingService.delete_setting(db, key)
     if not ok:
-        raise HTTPException(status_code=404, detail='配置不存在')
-    return {"msg": "删除成功"} 
+        return fail('配置不存在', code=404)
+    return success(None, msg="删除成功") 

@@ -1,3 +1,12 @@
+# Node.js
+node_modules/
+.npm/
+.cache/
+dist/
+
+# Parcel/Build
+.parcel-cache/
+
 # Python
 __pycache__/
 *.pyc
@@ -5,31 +14,32 @@ __pycache__/
 *.pyd
 *.sqlite3
 *.db
-.env
+*.egg-info/
 .venv/
 venv/
 
-# VSCode
+# VSCode/IDE
 .vscode/
-
-# macOS
+.idea/
 .DS_Store
 
-# Windows
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS
 Thumbs.db
+.DS_Store
 
 # FastAPI/SQLAlchemy
-instance/
-*.db
-*.sqlite
+alembic.ini
+migrations/
 
-# 前端
-node_modules/
-dist/
-build/
+# Vue前端
+frontend/node_modules/
+frontend/dist/
+frontend/.parcel-cache/
 
-# 日志
-*.log
-
-# 其他
-.idea/ 
+# 忽略 Windows 用户目录缓存
+%USERPROFILE%/

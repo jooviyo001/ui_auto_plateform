@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.core.database import SessionLocal
-from app.schemas.execution import BatchRunRequest, BatchRunResponse, CaseExecutionResult, AsyncBatchRunResponse, TaskStatusResponse
+from app.schemas.execution import BatchRunRequest, BatchRunResponse, CaseExecutionResult, AsyncBatchRunResponse, TaskStatusResponse, Execution
 from app.services.drission_executor import DrissionExecutor
 from app.services.case_service import CaseService
 from app.schemas.case import Step
@@ -9,6 +9,8 @@ from app.services.execution_service import ExecutionService
 from app.tasks.execution_tasks import batch_run_cases_task
 from celery.result import AsyncResult
 import json
+from app.utils.response import success, fail
+from app.schemas.common import ResponseModel
 
 router = APIRouter()
 
@@ -69,4 +71,35 @@ def get_execution_history(skip: int = 0, limit: int = 20, db: Session = Depends(
             'start_time': t.start_time,
             'end_time': t.end_time
         } for t in tasks
-    ] 
+    ]
+
+@router.get('/', response_model=ResponseModel)
+def get_executions(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    data = ExecutionService.get_executions(db, skip, limit)
+    return success(data)
+
+@router.post('/', response_model=ResponseModel)
+def create_execution(execution: Execution, db: Session = Depends(get_db)):
+    data = ExecutionService.create_execution(db, execution)
+    return success(data, msg="创建成功")
+
+@router.get('/{execution_id}', response_model=ResponseModel)
+def get_execution(execution_id: int, db: Session = Depends(get_db)):
+    data = ExecutionService.get_execution(db, execution_id)
+    if not data:
+        return fail("执行记录不存在", code=404)
+    return success(data)
+
+@router.put('/{execution_id}', response_model=ResponseModel)
+def update_execution(execution_id: int, execution: Execution, db: Session = Depends(get_db)):
+    data = ExecutionService.update_execution(db, execution_id, execution)
+    if not data:
+        return fail("执行记录不存在", code=404)
+    return success(data, msg="更新成功")
+
+@router.delete('/{execution_id}', response_model=ResponseModel)
+def delete_execution(execution_id: int, db: Session = Depends(get_db)):
+    data = ExecutionService.delete_execution(db, execution_id)
+    if not data:
+        return fail("执行记录不存在", code=404)
+    return success(data, msg="删除成功") 

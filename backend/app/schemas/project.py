@@ -1,8 +1,8 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional
  
 class Project(BaseModel):
-    id: Optional[int] = None
-    name: str
-    description: Optional[str] = None
-    owner: Optional[str] = None 
+    id: Optional[int] = Field(None, description="项目ID")
+    name: str = Field(..., description="项目名称")
+    description: Optional[str] = Field(None, description="项目描述")
+    owner: Optional[str] = Field(None, description="项目负责人") 

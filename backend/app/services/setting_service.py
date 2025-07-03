@@ -1,5 +1,5 @@
 from app.models.setting import Setting, Base
-from app.schemas.setting import SettingBase
+from app.schemas.setting import Setting
 from sqlalchemy.orm import Session
 import json
 
@@ -22,7 +22,7 @@ class SettingService:
         return [SettingService.parse_value(s) for s in settings]
 
     @staticmethod
-    def set_setting(db: Session, setting: SettingBase):
+    def set_setting(db: Session, setting: Setting):
         db_setting = SettingService.get_by_key(db, setting.key)
         if db_setting:
             # 确保我们处理的是实际的Setting实例，避免直接操作Column对象

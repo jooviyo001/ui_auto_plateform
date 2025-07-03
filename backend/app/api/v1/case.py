@@ -10,6 +10,8 @@ from app.services.case_import_export import (
     export_cases_to_json, import_cases_from_json
 )
 import tempfile, os
+from app.utils.response import success, fail
+from app.schemas.common import ResponseModel
 
 router = APIRouter()
 
@@ -20,47 +22,48 @@ def get_db():
     finally:
         db.close()
 
-@router.post('/', response_model=Case)
+@router.post('/', response_model=ResponseModel)
 def create_case(case: Case, db: Session = Depends(get_db)):
-    return CaseService.create_case(db, case)
+    data = CaseService.create_case(db, case)
+    return success(data, msg="创建成功")
 
-@router.get('/{case_id}', response_model=Case)
+@router.get('/{case_id}', response_model=ResponseModel)
 def get_case(case_id: int, db: Session = Depends(get_db)):
-    db_case = CaseService.get_case(db, case_id)
-    if not db_case:
-        raise HTTPException(status_code=404, detail="用例不存在")
+    data = CaseService.get_case(db, case_id)
+    if not data:
+        return fail("用例不存在", code=404)
     # 反序列化 steps
-    case_dict = db_case.__dict__.copy()
-    case_dict['steps'] = [Step(**step) for step in json.loads(db_case.steps)]
-    return case_dict
+    case_dict = data.__dict__.copy()
+    case_dict['steps'] = [Step(**step) for step in json.loads(data.steps)]
+    return success(case_dict)
 
-@router.get('/', response_model=List[Case])
+@router.get('/', response_model=ResponseModel)
 def get_cases(project_id: int = None, skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    db_cases = CaseService.get_cases(db, project_id, skip, limit)
+    data = CaseService.get_cases(db, project_id, skip, limit)
     result = []
-    for db_case in db_cases:
+    for db_case in data:
         case_dict = db_case.__dict__.copy()
         case_dict['steps'] = [Step(**step) for step in json.loads(db_case.steps)]
         result.append(case_dict)
-    return result
+    return success(result)
 
-@router.put('/{case_id}', response_model=Case)
+@router.put('/{case_id}', response_model=ResponseModel)
 def update_case(case_id: int, case: Case, db: Session = Depends(get_db)):
-    db_case = CaseService.update_case(db, case_id, case)
-    if not db_case:
-        raise HTTPException(status_code=404, detail="用例不存在")
-    case_dict = db_case.__dict__.copy()
-    case_dict['steps'] = [Step(**step) for step in json.loads(db_case.steps)]
-    return case_dict
+    data = CaseService.update_case(db, case_id, case)
+    if not data:
+        return fail("用例不存在", code=404)
+    case_dict = data.__dict__.copy()
+    case_dict['steps'] = [Step(**step) for step in json.loads(data.steps)]
+    return success(case_dict, msg="更新成功")
 
-@router.delete('/{case_id}', response_model=Case)
+@router.delete('/{case_id}', response_model=ResponseModel)
 def delete_case(case_id: int, db: Session = Depends(get_db)):
-    db_case = CaseService.delete_case(db, case_id)
-    if not db_case:
-        raise HTTPException(status_code=404, detail="用例不存在")
-    case_dict = db_case.__dict__.copy()
-    case_dict['steps'] = [Step(**step) for step in json.loads(db_case.steps)]
-    return case_dict
+    data = CaseService.delete_case(db, case_id)
+    if not data:
+        return fail("用例不存在", code=404)
+    case_dict = data.__dict__.copy()
+    case_dict['steps'] = [Step(**step) for step in json.loads(data.steps)]
+    return success(case_dict, msg="删除成功")
 
 @router.get('/export')
 def export_cases(format: str = 'excel', project_id: int = None, db: Session = Depends(get_db)):
