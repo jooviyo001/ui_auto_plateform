@@ -1,8 +1,12 @@
 import sys
 import os
 
-# 保证可以找到 app 包
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'app'))
+# 计算 backend 的上一级目录（项目根目录），并插入 sys.path[0]
+current_file = os.path.abspath(__file__)
+backend_dir = os.path.dirname(current_file)
+project_root = os.path.dirname(backend_dir)
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
 
 from app.core.database import engine, SessionLocal
 from app.models.user import User

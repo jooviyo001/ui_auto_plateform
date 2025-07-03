@@ -1,6 +1,15 @@
 import sys
 import os
-sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+
+# 计算 backend 的上一级目录（项目根目录），并插入 sys.path[0]
+current_file = os.path.abspath(__file__)
+backend_dir = os.path.dirname(current_file)
+project_root = os.path.dirname(backend_dir)
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+
+# 可选：调试用，打印 sys.path
+print("sys.path:", sys.path)
 
 from app.models import Base
 from app.core.database import engine
@@ -17,8 +26,7 @@ def reset_database():
 
 def create_superadmin():
     print("正在创建超级管理员账户...")
-    project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-    script_path = os.path.join(project_root, "backend", "scripts", "create_superadmin.py")
+    script_path = os.path.join(os.path.dirname(__file__), "create_superadmin.py")
     result = subprocess.run([sys.executable, script_path], capture_output=True, text=True)
     print(result.stdout)
     if result.stderr:
@@ -26,5 +34,5 @@ def create_superadmin():
 
 if __name__ == "__main__":
     reset_database()
-    create_superadmin()
+    # create_superadmin()
     print("全部完成！") 
