@@ -17,7 +17,8 @@ def reset_database():
 
 def create_superadmin():
     print("正在创建超级管理员账户...")
-    script_path = os.path.join(os.path.dirname(__file__), "create_superadmin.py")
+    project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+    script_path = os.path.join(project_root, "backend", "scripts", "create_superadmin.py")
     result = subprocess.run([sys.executable, script_path], capture_output=True, text=True)
     print(result.stdout)
     if result.stderr:
