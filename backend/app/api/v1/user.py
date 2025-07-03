@@ -1,14 +1,15 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from pydantic import BaseModel
 from app.core.database import SessionLocal
 from app.schemas.user import UserLogin, UserCreate, UserOut
 from app.services.user_service import UserService
 from app.core.jwt_auth import create_access_token, verify_access_token
 from app.models.user import User
-from typing import List, cast
-from app.utils.response import fail
-from app.services.user_service import pwd_context  # 单独导入pwd_context
+from typing import List, cast, Callable
+from app.utils.response import fail, success
+from app.services.user_service import pwd_context
 
 router = APIRouter()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/user/login")
@@ -17,6 +18,14 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/user/login")
 ROLE_SUPERADMIN = 'superadmin'
 ROLE_ADMIN = 'admin'
 ROLE_USER = 'user'
+
+def require_roles(*required_roles: str) -> Callable:
+    def role_checker(current_user: User = Depends(get_current_user)) -> User:
+        if current_user.role not in required_roles:
+            raise HTTPException(status_code=403, detail="无权限")
+        return current_user
+    return role_checker
+
 
 def get_db():
     db = SessionLocal()
@@ -37,13 +46,13 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
         raise HTTPException(status_code=401, detail="用户不存在或已禁用")
     return cast(User, user)
 
-@router.post("/login", response_model=UserOut)
-def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
-    user = UserService.authenticate_user(db, form_data.username, form_data.password)
+@router.post("/login")
+def login_for_access_token(user_login: UserLogin, db: Session = Depends(get_db)):
+    user = UserService.authenticate_user(db, user_login.username, user_login.password)
     if not user:
-        raise HTTPException(status_code=401, detail="用户名或密码错误")
+        return fail(msg="用户名或密码错误")
     access_token = create_access_token(data={"sub": user.username})
-    return {"access_token": access_token, "token_type": "bearer"}
+    return success(data={"access_token": access_token, "token_type": "bearer"})
 
 @router.post("/register", response_model=UserOut)
 def register_user(user: UserCreate, db: Session = Depends(get_db)):
