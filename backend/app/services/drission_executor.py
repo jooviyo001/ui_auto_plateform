@@ -1,8 +1,14 @@
-from drissionpage import ChromiumPage
+from DrissionPage import ChromiumPage, ChromiumOptions
+
 
 class DrissionExecutor:
     def __init__(self, headless: bool = True):
-        self.page = ChromiumPage(headless=headless)
+        # 创建ChromiumOptions实例并设置无头模式
+        options = ChromiumOptions()
+        if headless:
+            options.headless(True)
+        # 将options作为参数传递给ChromiumPage
+        self.page = ChromiumPage(options=options) # type: ignore
 
     def run_steps(self, steps: list):
         """
@@ -28,4 +34,4 @@ class DrissionExecutor:
             # 可扩展更多操作
             else:
                 results.append(f"Unknown action: {action}")
-        return results 
+        return results
