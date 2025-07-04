@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ report.header.title }}</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1, h2 { color: #333; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+    </style>
+</head>
+<body>
+    <h1>{{ report.header.title }}</h1>
+    <p><strong>日期:</strong> {{ report.header.date }}<br>
+       <strong>项目名称:</strong> {{ report.header.project_name }}<br>
+       <strong>测试人员:</strong> {{ report.header.tester }}</p>
+
+    <h2>测试概述</h2>
+    <p><strong>总测试数:</strong> {{ report.test_overview.total_tests }}<br>
+       <strong>通过:</strong> {{ report.test_overview.passed }}<br>
+       <strong>失败:</strong> {{ report.test_overview.failed }}<br>
+       <strong>跳过:</strong> {{ report.test_overview.skipped }}<br>
+       <strong>通过率:</strong> {{ report.test_overview.pass_rate }}</p>
+
+    <h2>测试结果</h2>
+    <table>
+        <tr>
+            <th>测试项</th>
+            <th>状态</th>
+        </tr>
+        {% for test in report.test_results.tests %}
+        <tr>
+            <td>{{ test.name }}</td>
+            <td>{{ test.status }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <h2>结论</h2>
+    <p><strong>总结:</strong> {{ report.conclusion.summary }}<br>
+       <strong>备注:</strong> {{ report.conclusion.remarks }}</p>
+</body>
+</html>

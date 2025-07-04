@@ -11,6 +11,9 @@ class UserCreate(UserBase):
 
 class UserOut(UserBase):
     id: int = Field(..., description="用户ID")
+    createTime: Optional[str] = Field(None, description="创建时间")
+    updateTime: Optional[str] = Field(None, description="更新时间")
+    isDelete: Optional[bool] = Field(False, description="是否删除")
 
 class UserLogin(BaseModel):
     username: str = Field(..., description="用户名")

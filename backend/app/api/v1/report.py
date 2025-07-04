@@ -55,8 +55,8 @@ def get_reports(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     return success(data)
 
 @router.get('/{report_id}', response_model=ResponseModel)
-def get_report(report_id: int, db: Session = Depends(get_db)):
-    data = report_service.get_report(db, report_id)
+def get_report(report_id: int, limit: int = 100, db: Session = Depends(get_db)):
+    data = report_service.get_reports(db, report_id, limit)
     if not data:
         return fail("报告不存在", code=404)
     return success(data) 

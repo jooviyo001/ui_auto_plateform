@@ -18,18 +18,18 @@ def get_db():
         db.close()
 
 @router.get('/', response_model=ResponseModel)
-def list_settings(group: str = None, db: Session = Depends(get_db), _: str = Depends(require_roles([ROLE_SUPERADMIN]))):
+def list_settings(group: str = "", db: Session = Depends(get_db), _: str = Depends(require_roles(ROLE_SUPERADMIN))):
     data = SettingService.get_all(db, group)
     return success(data)
 
 @router.post('/', response_model=ResponseModel)
-def set_setting(setting: Setting, db: Session = Depends(get_db), _: str = Depends(require_roles([ROLE_SUPERADMIN]))):
+def set_setting(setting: Setting, db: Session = Depends(get_db), _: str = Depends(require_roles(ROLE_SUPERADMIN))):
     data = SettingService.set_setting(db, setting)
     return success(data, msg="设置成功")
 
 @router.delete('/{key}', response_model=ResponseModel)
-def delete_setting(key: str, db: Session = Depends(get_db), _: str = Depends(require_roles([ROLE_SUPERADMIN]))):
+def delete_setting(key: str, db: Session = Depends(get_db), _: str = Depends(require_roles(ROLE_SUPERADMIN))):
     ok = SettingService.delete_setting(db, key)
     if not ok:
         return fail('配置不存在', code=404)
-    return success(None, msg="删除成功") 
+    return success(None, msg="删除成功")

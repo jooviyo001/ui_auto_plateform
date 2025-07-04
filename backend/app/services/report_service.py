@@ -2,9 +2,22 @@ import os
 from jinja2 import Template
 import json
 from collections import Counter, defaultdict
+from typing import List  # 添加 List 类型用于类型提示
 
 REPORT_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'reports')
 os.makedirs(REPORT_DIR, exist_ok=True)
+
+
+def get_reports(db, skip, limit) -> List[str]:  # 添加类型提示
+    # 示例实现：返回 REPORT_DIR 中的所有报告文件名（不含扩展名）
+    try:
+        files = [f.replace('.html', '') for f in os.listdir(REPORT_DIR) if f.endswith('.html')]
+        return files[skip:skip+limit]
+    except Exception as e:
+        # 处理异常情况
+        print(f"Error occurred while fetching reports: {e}")
+        return []
+
 
 REPORT_TEMPLATE = """
 <!DOCTYPE html>

@@ -21,6 +21,7 @@ def create_superadmin():
     username = "admin"
     password = "123456"
     role = "superadmin"
+    
     # 检查是否已存在
     user = session.query(User).filter_by(username=username).first()
     if user:
@@ -35,6 +36,14 @@ def create_superadmin():
     session.close()
     print("超级管理员创建成功，账号：admin，密码：123456")
 
+def print_users_passwords():
+    session = SessionLocal()
+    users = session.query(User).all()
+    for user in users:
+        print(f"用户名: {user.username}, 密码: {user.hashed_password}, 是否激活: {user.is_active}")
+    session.close()
+
 if __name__ == "__main__":
     create_tables()
     create_superadmin()
+    print_users_passwords()
